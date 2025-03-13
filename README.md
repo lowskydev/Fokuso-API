@@ -18,6 +18,11 @@ Ensure you have the following installed:
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+### Clone the repository
+
+```bash
+git clone https://github.com/yourusername/study-learning-web-app.git
+
 ### Running the Application
 
 To start the service, run:
@@ -72,8 +77,3 @@ docker compose run --rm app sh -c "flake8"
 ## Continuous Integration (CI)
 
 This project uses GitHub Actions for automated testing and linting on every push and pull request.
-
-### Clone the repository
-
-```bash
-git clone https://github.com/yourusername/study-learning-web-app.git
