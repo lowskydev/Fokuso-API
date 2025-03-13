@@ -22,6 +22,7 @@ Ensure you have the following installed:
 
 ```bash
 git clone https://github.com/yourusername/study-learning-web-app.git
+```
 
 ### Running the Application
 
