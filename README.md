@@ -1,4 +1,4 @@
-# Django API with Docker
+# Django API with Docker for Studying Software
 
 This is a Django-based API application containerized with Docker. The application includes API documentation using Swagger UI and employs GitHub Actions for linting and testing.
 
