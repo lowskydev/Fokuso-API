@@ -1,23 +1,77 @@
-# Organize-Study-Software
+# Django API with Docker
 
-A web-based platform designed to enhance the learning experience with features tailored for study management, collaborative learning, and productivity. This app aims to provide users with an intuitive interface to track their progress, access study materials, and collaborate with peers.
+This is a Django-based API application containerized with Docker. The application includes API documentation using Swagger UI and employs GitHub Actions for linting and testing.
 
 ## Features
-- **Pomodor Timer**: Custom timer
-- **Calendar**
 
-## Technologies Used
+- Django API application
+- Dockerized setup (for both database and app)
+- Swagger UI for API documentation
+- GitHub Actions for CI/CD (linting and testing)
+- Admin panel for database management
 
-- **Frontend**: React (or another frontend framework)
-- **Backend**: Django API
-- **Database**: PostgreSQL 
-- **Deployment**: Docker?
+## Getting Started
 
-Make sure you have the following installed:
+### Prerequisites
 
-- Node.js
-- Python (if using Django for backend)
-- PostgreSQL (or your chosen database)
+Ensure you have the following installed:
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Running the Application
+
+To start the service, run:
+
+```sh
+docker compose up
+```
+
+To stop the service:
+
+```sh
+docker compose down
+```
+
+### Accessing the Application
+
+- **API Documentation**: [Swagger UI](http://127.0.0.1:8000/api/docs)
+- **Admin Panel**: [Django Admin](http://127.0.0.1:8000/admin)
+
+### Running Tests
+
+To run tests directly in the app container:
+
+```sh
+docker compose run --rm app sh -c "python manage.py test"
+```
+
+### Creating a Superuser
+
+To create a superuser for the admin panel:
+
+```sh
+docker compose run --rm app sh -c "python manage.py createsuperuser"
+```
+
+### Applying Migrations
+
+Ensure database migrations are applied:
+
+```sh
+docker compose run --rm app sh -c "python manage.py migrate"
+```
+
+### Checking Code Formatting & Linting
+
+If using `flake8` for linting, run:
+
+```sh
+docker compose run --rm app sh -c "flake8"
+```
+
+## Continuous Integration (CI)
+
+This project uses GitHub Actions for automated testing and linting on every push and pull request.
 
 ### Clone the repository
 
