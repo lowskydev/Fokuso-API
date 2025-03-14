@@ -45,7 +45,7 @@ docker compose down
 
 ### Running Tests
 
-To run tests directly in the app container:
+This project follows Test Driven Development Approach to structure the code. Tests are utilzed using Django Unit tests. To run tests directly in the app container:
 
 ```sh
 docker compose run --rm app sh -c "python manage.py test"
