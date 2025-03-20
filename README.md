@@ -21,7 +21,7 @@ Ensure you have the following installed:
 ### Clone the repository
 
 ```bash
-git clone https://github.com/lowskydev/fokuso-api.git
+git clone https://github.com/lowskydev/Fokuso-API.git
 ```
 
 ### Running the Application
