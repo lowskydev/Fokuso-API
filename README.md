@@ -43,6 +43,8 @@ docker compose down
 - **API Documentation**: [Swagger UI](http://127.0.0.1:8000/api/docs)
 - **Admin Panel**: [Django Admin](http://127.0.0.1:8000/admin)
 
+## Managing Application
+
 ### Running Tests
 
 This project follows Test Driven Development Approach to structure the code. Tests are utilzed using Django Unit tests. To run tests directly in the app container:
