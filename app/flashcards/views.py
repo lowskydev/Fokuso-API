@@ -10,8 +10,6 @@ from core.models import Flashcard
 
 from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
 
-from django.utils import timezone
-
 
 class FlashcardListCreateView(generics.ListCreateAPIView):
     """

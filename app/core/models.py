@@ -80,13 +80,15 @@ class Flashcard(models.Model):
     )
     question = models.TextField(blank=False)
     answer = models.TextField(blank=False)
-    next_review = models.DateTimeField(default=timezone.now)  # next review date
+    # The next review date for the flashcard
+    next_review = models.DateTimeField(default=timezone.now)
     interval = models.IntegerField(default=1)  # in days
+    # Ease factor for spaced repetition SM2 algorithm
     ease_factor = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=Decimal('2.50')
-    )   # ease factor for spaced repetition SM2 algorithm
+    )
     repetition = models.IntegerField(default=0)  # number of repetitions
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
