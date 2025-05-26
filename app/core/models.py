@@ -8,6 +8,10 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+from django.conf import settings
+
+from decimal import Decimal
+
 
 class UserManager(BaseUserManager):
     """Manager for users"""
@@ -47,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Note(models.Model):
     """Note object"""
-    owner = models.ForeignKey('core.User', on_delete=models.CASCADE, related_name='notes')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notes')
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -58,3 +62,30 @@ class Note(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Flashcard(models.Model):
+    """Flashcard object"""
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='flashcards'
+    )
+    question = models.TextField(blank=False)
+    answer = models.TextField(blank=False)
+    next_review = models.DateTimeField()
+    interval = models.IntegerField(default=1)  # in days
+    ease_factor = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('2.5')
+    ) # ease factor for spaced repetition SM2 algorithm
+    repetition = models.IntegerField(default=0)  # number of repetitions
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-next_review']
+
+    def __str__(self):
+        return f"Flashcard {self.id} - {self.question[:50]}..."
