@@ -14,7 +14,7 @@ from core.models import Flashcard
 from serializers import FlashcardSerializer
 
 
-class FlashcardListViewSet(viewsets.ModelViewSet):
+class FlashcardListCreateView(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing flashcards.
     """
@@ -34,7 +34,7 @@ class FlashcardListViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class FlashcardsDetailViewSet(generics.RetrieveUpdateDestroyAPIView):
+class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     A viewset for viewing and editing flashcards.
     """
