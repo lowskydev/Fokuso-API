@@ -26,7 +26,6 @@ class FlashcardListCreateView(generics.ListCreateAPIView):
             owner=self.request.user
             ).order_by('created_at')
 
-
     def get_serializer_class(self):
         """Return the appropriate serializer class based on the action."""
         if self.request.method == 'GET':

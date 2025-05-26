@@ -14,7 +14,7 @@ from django.utils.dateparse import parse_datetime
 
 from core.models import Flashcard
 
-from flashcards.serializers import FlashcardSerializer
+from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
 
 
 FLASHCARDS_URL = reverse('flashcards:flashcard-list-create')
@@ -77,7 +77,7 @@ class PrivateFlashcardsApiTests(TestCase):
         response = self.client.get(FLASHCARDS_URL)
 
         flashcards = Flashcard.objects.all().order_by('created_at')
-        serializer = FlashcardSerializer(flashcards, many=True)
+        serializer = FlashcardListSerializer(flashcards, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
@@ -97,7 +97,7 @@ class PrivateFlashcardsApiTests(TestCase):
         flashcards = Flashcard.objects.filter(
             owner=self.user
             ).order_by('-created_at')
-        serializer = FlashcardSerializer(flashcards, many=True)
+        serializer = FlashcardListSerializer(flashcards, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
