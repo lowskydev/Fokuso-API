@@ -31,4 +31,8 @@ urlpatterns = [
     ),
     path('api/user/', include('user.urls')),
     path('api/notes/', include('notes.urls')),
+    path('api/flashcards/', include(
+        ('flashcards.urls', 'flashcards'),
+        namespace='flashcards',
+        )),
 ]

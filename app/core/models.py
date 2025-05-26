@@ -83,7 +83,7 @@ class Flashcard(models.Model):
     ease_factor = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=Decimal('2.5')
+        default=Decimal('2.50')
     )   # ease factor for spaced repetition SM2 algorithm
     repetition = models.IntegerField(default=0)  # number of repetitions
     created_at = models.DateTimeField(auto_now_add=True)

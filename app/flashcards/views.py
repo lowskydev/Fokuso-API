@@ -1,20 +1,17 @@
 """
 Views for the flashcards app.
 """
-from rest_framework import (
-    viewsets,
-    generics,
-)
+from rest_framework import generics
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from core.models import Flashcard
 
-from serializers import FlashcardSerializer
+from flashcards.serializers import FlashcardSerializer
 
 
-class FlashcardListCreateView(viewsets.ModelViewSet):
+class FlashcardListCreateView(generics.ListCreateAPIView):
     """
     A viewset for viewing and editing flashcards.
     """
@@ -26,12 +23,12 @@ class FlashcardListCreateView(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrive flashcards for the authenticated user."""
         return self.queryset.filter(
-            user=self.request.user
+            owner=self.request.user
             ).order_by('created_at')
 
     def perform_create(self, serializer):
         """Assign the flashcard to the authenticated user."""
-        serializer.save(user=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -46,5 +43,5 @@ class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """Retrive flashcards for the authenticated user."""
         return self.queryset.filter(
-            user=self.request.user
+            owner=self.request.user
             ).order_by('created_at')
