@@ -1,7 +1,9 @@
+"""
+Serializers for the Note model.
+"""
 from rest_framework import serializers
 from core.models import Note
 
-"""Serializer works as a translator from JSON to Python/Django model instance"""
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:

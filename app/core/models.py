@@ -49,9 +49,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
+
 class Note(models.Model):
     """Note object"""
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notes')
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notes'
+    )
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -79,7 +84,7 @@ class Flashcard(models.Model):
         max_digits=5,
         decimal_places=2,
         default=Decimal('2.5')
-    ) # ease factor for spaced repetition SM2 algorithm
+    )   # ease factor for spaced repetition SM2 algorithm
     repetition = models.IntegerField(default=0)  # number of repetitions
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

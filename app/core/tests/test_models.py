@@ -1,12 +1,13 @@
 """
 Test for models
 """
-from decimal import Decimal
-
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 from core import models
+
+from django.utils import timezone
+from datetime import timedelta
 
 
 def create_user(email='user@example.com', password='testpass123'):
@@ -56,3 +57,17 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_flashcard(self):
+        """Test creating a flashcard is successful"""
+        user = create_user()
+        flashcard = models.Flashcard.objects.create(
+            owner=user,
+            question='What is the capital of France?',
+            answer='Paris',
+            next_review=timezone.now() + timedelta(days=1),
+        )
+
+        self.assertEqual(flashcard.owner, user)
+        self.assertEqual(flashcard.question, 'What is the capital of France?')
+        self.assertEqual(flashcard.answer, 'Paris')

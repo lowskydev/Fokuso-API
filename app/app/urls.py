@@ -30,5 +30,5 @@ urlpatterns = [
         name='api-docs',
     ),
     path('api/user/', include('user.urls')),
-    path('api/notes/', include('notes.urls')), # This will reroute to notes/urls
+    path('api/notes/', include('notes.urls')),
 ]

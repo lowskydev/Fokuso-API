@@ -1,13 +1,13 @@
-from django.shortcuts import render
+"""
+Serializers for the Note model.
+"""
 from rest_framework import generics, permissions
 from core.models import Note
 from .serializers import NoteSerializer
 from rest_framework.authentication import TokenAuthentication
 
-"""Views decides which action to take, such as POST, GET...depending on the request form client"""
 
-
-#Handles GET (list all notes) and POST (create notes)
+# Handles GET (list all notes) and POST (create notes)
 class NoteListCreateView(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
     authentication_classes = [TokenAuthentication]
@@ -21,7 +21,9 @@ class NoteListCreateView(generics.ListCreateAPIView):
         """Assign the new notes to the logged-in user"""
         serializer.save(owner=self.request.user)
 
-#Handles GET(retreive one note), PUT (Edit whole note), PATCH (update part of note), DELETE
+
+# Handles GET(retreive one note), PUT (Edit whole note),
+# PATCH (update part of note), DELETE
 class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = NoteSerializer
     authentication_classes = [TokenAuthentication]
