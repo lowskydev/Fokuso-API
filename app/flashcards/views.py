@@ -10,6 +10,8 @@ from core.models import Flashcard
 
 from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
 
+from django.utils import timezone
+
 
 class FlashcardListCreateView(generics.ListCreateAPIView):
     """
@@ -34,7 +36,9 @@ class FlashcardListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         """Assign the flashcard to the authenticated user."""
-        serializer.save(owner=self.request.user)
+        serializer.save(
+            owner=self.request.user,
+        )
 
 
 class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):

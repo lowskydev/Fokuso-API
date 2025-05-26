@@ -12,6 +12,8 @@ from django.conf import settings
 
 from decimal import Decimal
 
+from django.utils import timezone
+
 
 class UserManager(BaseUserManager):
     """Manager for users"""
@@ -78,7 +80,7 @@ class Flashcard(models.Model):
     )
     question = models.TextField(blank=False)
     answer = models.TextField(blank=False)
-    next_review = models.DateTimeField()
+    next_review = models.DateTimeField(default=timezone.now)  # next review date
     interval = models.IntegerField(default=1)  # in days
     ease_factor = models.DecimalField(
         max_digits=5,
