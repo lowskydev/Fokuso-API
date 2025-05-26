@@ -8,7 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from core.models import Flashcard
 
-from flashcards.serializers import FlashcardSerializer
+from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
 
 
 class FlashcardListCreateView(generics.ListCreateAPIView):
@@ -25,6 +25,13 @@ class FlashcardListCreateView(generics.ListCreateAPIView):
         return self.queryset.filter(
             owner=self.request.user
             ).order_by('created_at')
+
+
+    def get_serializer_class(self):
+        """Return the appropriate serializer class based on the action."""
+        if self.request.method == 'GET':
+            return FlashcardListSerializer
+        return FlashcardSerializer
 
     def perform_create(self, serializer):
         """Assign the flashcard to the authenticated user."""
