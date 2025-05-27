@@ -1,9 +1,12 @@
 """
 SM2 Algorithm Implementation
 """
+
+
 def sm2(grade, old_ease_factor, old_interval, old_repetition):
     """
-    Apply SM2 algorithm to update scheduling fields based on user's recall grade.
+    Apply SM2 algorithm to update scheduling
+    fields based on user's recall grade.
     grade: int (0-5)
     old_ease_factor: Decimal or float
     old_interval: int (days)
@@ -29,7 +32,9 @@ def sm2(grade, old_ease_factor, old_interval, old_repetition):
         new_interval = int(old_interval * old_ease_factor)
 
     # Update ease factor
-    new_ease_factor = old_ease_factor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))
+    new_ease_factor = (old_ease_factor +
+                       (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))
+                       )
     new_ease_factor = max(new_ease_factor, MIN_EF)
 
     return (new_ease_factor, new_interval, new_repetition)
