@@ -1,3 +1,6 @@
+"""
+Tests for the Review Log API.
+"""
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -13,14 +16,17 @@ REVIEW_LOGS_URL = reverse('flashcards:review-log-list')
 
 
 def create_user(**params):
+    """Create and return a sample user."""
     return get_user_model().objects.create_user(**params)
 
 
 def create_deck(user, name="Test Deck"):
+    """Create and return a sample deck."""
     return Deck.objects.create(owner=user, name=name)
 
 
 def create_flashcard(user, deck, **params):
+    """Create and return a sample flashcard."""
     defaults = {
         'question': 'Sample question?',
         'answer': 'Sample answer.',
@@ -35,20 +41,26 @@ def create_flashcard(user, deck, **params):
 
 
 def review_url(flashcard_id):
+    """Create and return the review URL for a flashcard."""
     return reverse('flashcards:flashcard-review', args=[flashcard_id])
 
 
 class PublicReviewLogApiTests(TestCase):
+    """Test the public features of the Review Log API."""
     def setUp(self):
+        """Set up the API client for public tests."""
         self.client = APIClient()
 
     def test_auth_required(self):
+        """Test that authentication is required to access review logs."""
         res = self.client.get(REVIEW_LOGS_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateReviewLogApiTests(TestCase):
+    """Test the private features of the Review Log API."""
     def setUp(self):
+        """Set up the API client and create a user, deck, and flashcard."""
         self.client = APIClient()
         self.user = create_user(
             email='user@example.com',
