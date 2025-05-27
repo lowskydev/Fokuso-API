@@ -13,9 +13,11 @@ from flashcards.serializers import DeckSerializer
 
 DECKS_URL = reverse('flashcards:deck-list-create')
 
+
 def detail_url(deck_id):
     """Return deck detail URL."""
     return reverse('flashcards:deck-detail', args=[deck_id])
+
 
 def create_deck(user, **params):
     """Create and return a sample deck."""
@@ -23,9 +25,11 @@ def create_deck(user, **params):
     defaults.update(params)
     return Deck.objects.create(owner=user, **defaults)
 
+
 def create_user(**params):
     """Create and return a sample user."""
     return get_user_model().objects.create_user(**params)
+
 
 class PublicDeckApiTests(TestCase):
     """Test the public features of the Deck API."""
@@ -37,6 +41,7 @@ class PublicDeckApiTests(TestCase):
         """Test that authentication is required to access decks."""
         response = self.client.get(DECKS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateDeckApiTests(TestCase):
     """Test the private features of the Deck API."""
