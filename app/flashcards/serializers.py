@@ -2,7 +2,11 @@
 Serializers for the Flashcard model.
 """
 from rest_framework import serializers
-from core.models import Flashcard, Deck
+from core.models import (
+    Flashcard,
+    Deck,
+    ReviewLog,
+)
 
 
 class DeckSerializer(serializers.ModelSerializer):
@@ -48,3 +52,13 @@ class FlashcardReviewSerializer(serializers.Serializer):
     )
     new_repetition = serializers.IntegerField(read_only=True)
     new_next_review = serializers.DateTimeField(read_only=True)
+
+
+class ReviewLogSerializer(serializers.ModelSerializer):
+    flashcard_id = serializers.IntegerField(source='flashcard.id', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = ReviewLog
+        fields = ['id', 'flashcard_id', 'user_id', 'reviewed_at', 'grade']
+        read_only_fields = fields
