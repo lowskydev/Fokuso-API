@@ -21,8 +21,7 @@ from flashcards.serializers import (
 from django.utils import timezone
 from datetime import timedelta
 
-from flashcards.utils import sm2
-
+from flashcards.sm2 import sm2  # Assuming sm2 is a function in flashcards.sm2 module
 
 
 class DeckListCreateView(generics.ListCreateAPIView):
