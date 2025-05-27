@@ -71,12 +71,36 @@ class Note(models.Model):
         return self.title
 
 
+class Deck(models.Model):
+    """Deck object for organizing flashcards"""
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='decks'
+    )
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('owner', 'name')
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return self.name
+
+
 class Flashcard(models.Model):
     """Flashcard object"""
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='flashcards'
+    )
+    deck = models.ForeignKey(
+        Deck,
+        on_delete=models.CASCADE,
+        related_name='flashcards',
     )
     question = models.TextField(blank=False)
     answer = models.TextField(blank=False)
