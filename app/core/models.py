@@ -76,7 +76,7 @@ class Deck(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='decks'
+        related_name='decks',
     )
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -101,6 +101,8 @@ class Flashcard(models.Model):
         Deck,
         on_delete=models.CASCADE,
         related_name='flashcards',
+        blank=True,
+        null=True
     )
     question = models.TextField(blank=False)
     answer = models.TextField(blank=False)
