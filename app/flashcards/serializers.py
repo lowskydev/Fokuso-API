@@ -26,7 +26,9 @@ class FlashcardSerializer(serializers.ModelSerializer):
         # Only allow decks belonging to the authenticated user
         user = self.context['request'].user
         if value.owner != user:
-            raise serializers.ValidationError("You can only assign flashcards to your own decks.")
+            raise serializers.ValidationError(
+                "You can only assign flashcards to your own decks."
+                )
         return value
 
 
