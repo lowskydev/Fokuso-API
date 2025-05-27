@@ -1,0 +1,122 @@
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from core.models import Flashcard, Deck, ReviewLog
+from django.utils import timezone
+from decimal import Decimal
+
+
+REVIEW_LOGS_URL = reverse('flashcards:review-log-list')
+
+
+def create_user(**params):
+    return get_user_model().objects.create_user(**params)
+
+
+def create_deck(user, name="Test Deck"):
+    return Deck.objects.create(owner=user, name=name)
+
+
+def create_flashcard(user, deck, **params):
+    defaults = {
+        'question': 'Sample question?',
+        'answer': 'Sample answer.',
+        'deck': deck,
+        'next_review': timezone.now(),
+        'interval': 1,
+        'ease_factor': Decimal('2.5'),
+        'repetition': 0,
+    }
+    defaults.update(params)
+    return Flashcard.objects.create(owner=user, **defaults)
+
+
+def review_url(flashcard_id):
+    return reverse('flashcards:flashcard-review', args=[flashcard_id])
+
+
+class PublicReviewLogApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_auth_required(self):
+        res = self.client.get(REVIEW_LOGS_URL)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateReviewLogApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user(
+            email='user@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(self.user)
+        self.deck = create_deck(self.user)
+        self.flashcard = create_flashcard(self.user, deck=self.deck)
+
+    def test_review_log_created_on_review(self):
+        """Test a ReviewLog is created when reviewing a flashcard."""
+        payload = {'grade': 4}
+        res = self.client.post(review_url(self.flashcard.id),
+                               payload,
+                               format='json',
+                               )
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        logs = ReviewLog.objects.filter(
+            user=self.user,
+            flashcard=self.flashcard,
+        )
+        self.assertEqual(logs.count(), 1)
+        log = logs.first()
+        self.assertEqual(log.grade, 4)
+        self.assertIsNotNone(log.reviewed_at)
+
+    def test_review_log_list(self):
+        """Test listing review logs for the authenticated user."""
+        # Create a couple of review logs
+        ReviewLog.objects.create(
+            user=self.user,
+            flashcard=self.flashcard,
+            grade=4,
+        )
+        ReviewLog.objects.create(
+            user=self.user,
+            flashcard=self.flashcard,
+            grade=5,
+        )
+
+        res = self.client.get(REVIEW_LOGS_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        self.assertTrue(all(
+            log['flashcard_id'] == self.flashcard.id for log in res.data
+        ))
+
+    def test_review_log_limited_to_user(self):
+        """Test that a user only sees their own review logs."""
+        other_user = create_user(
+            email='other@example.com',
+            password='testpass123',
+        )
+        other_deck = create_deck(other_user)
+        other_flashcard = create_flashcard(other_user, deck=other_deck)
+        ReviewLog.objects.create(
+            user=other_user,
+            flashcard=other_flashcard,
+            grade=3,
+        )
+        ReviewLog.objects.create(
+            user=self.user,
+            flashcard=self.flashcard,
+            grade=5,
+        )
+
+        res = self.client.get(REVIEW_LOGS_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]['grade'], 5)
