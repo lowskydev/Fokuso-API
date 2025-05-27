@@ -8,6 +8,7 @@ from .views import (
     DeckListCreateView,
     DeckDetailView,
     FlashcardReviewView,
+    ReviewLogListView,
 )
 
 app_name = 'flashcards'
@@ -26,4 +27,7 @@ urlpatterns = [
          FlashcardReviewView.as_view(),
          name='flashcard-review',
          ),
+
+    # Review Log Endpoint
+    path('review-logs/', ReviewLogListView.as_view(), name='review-log-list'),
 ]

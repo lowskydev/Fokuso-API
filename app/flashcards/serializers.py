@@ -55,7 +55,10 @@ class FlashcardReviewSerializer(serializers.Serializer):
 
 
 class ReviewLogSerializer(serializers.ModelSerializer):
-    flashcard_id = serializers.IntegerField(source='flashcard.id', read_only=True)
+    flashcard_id = serializers.IntegerField(
+        source='flashcard.id',
+        read_only=True,
+    )
     user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
