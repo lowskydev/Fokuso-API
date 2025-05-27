@@ -153,6 +153,14 @@ class FlashcardReviewView(GenericAPIView):
         flashcard.next_review = new_next_review
         flashcard.save()
 
+        # Log the review
+        flashcard.review_logs.create(
+            flashcard=flashcard,
+            user=request.user,
+            grade=grade,
+            reviewed_at=timezone.now()
+        )
+
         response_data = {
             'grade': grade,
             'new_interval': interval,
