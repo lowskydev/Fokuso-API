@@ -6,7 +6,6 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from core.models import Flashcard, Deck
@@ -21,7 +20,7 @@ from flashcards.serializers import (
 from django.utils import timezone
 from datetime import timedelta
 
-from flashcards.sm2 import sm2  # Assuming sm2 is a function in flashcards.sm2 module
+from flashcards.sm2 import sm2
 
 from rest_framework.generics import GenericAPIView
 
@@ -74,13 +73,17 @@ class FlashcardListCreateView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
-        """Retrive flashcards for the authenticated user."""
+        """
+        Retrive flashcards for the authenticated user.
+        """
         return self.queryset.filter(
             owner=self.request.user
             ).order_by('created_at')
 
     def get_serializer_class(self):
-        """Return the appropriate serializer class based on the action."""
+        """
+        Return the appropriate serializer class based on the action.
+        """
         if self.request.method == 'GET':
             return FlashcardListSerializer
         return FlashcardSerializer
@@ -102,7 +105,9 @@ class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
-        """Retrive flashcards for the authenticated user."""
+        """
+        Retrive flashcards for the authenticated user.
+        """
         return self.queryset.filter(
             owner=self.request.user
             ).order_by('created_at')
@@ -117,7 +122,10 @@ class FlashcardReviewView(GenericAPIView):
         try:
             flashcard = Flashcard.objects.get(pk=pk, owner=request.user)
         except Flashcard.DoesNotExist:
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'detail': 'Not found.'},
+                status=status.HTTP_404_NOT_FOUND
+                )
 
         serializer = FlashcardReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -132,7 +140,11 @@ class FlashcardReviewView(GenericAPIView):
         )
 
         # Compute new next_review
-        new_next_review = timezone.now() + timedelta(days=interval)
+        if interval == 0:
+            # If interval is 0, set next review to now (immediate review)
+            new_next_review = timezone.now()
+        else:
+            new_next_review = timezone.now() + timedelta(days=interval)
 
         # Save updated values
         flashcard.ease_factor = ef

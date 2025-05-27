@@ -22,5 +22,8 @@ urlpatterns = [
     path('<int:pk>/', FlashcardsDetailView.as_view(), name='flashcard-detail'),
 
     # Flashcard Review Endpoint
-    path('<int:pk>/review/', FlashcardReviewView.as_view(), name='flashcard-review'),
+    path('<int:pk>/review/',
+         FlashcardReviewView.as_view(),
+         name='flashcard-review',
+         ),
 ]
