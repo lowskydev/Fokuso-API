@@ -124,3 +124,27 @@ class Flashcard(models.Model):
 
     def __str__(self):
         return f"Flashcard {self.id} - {self.question[:50]}..."
+
+
+class ReviewLog(models.Model):
+    """Log of flashcard reviews"""
+    flashcard = models.ForeignKey(
+        Flashcard,
+        on_delete=models.CASCADE,
+        related_name='review_logs'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='review_logs'
+    )
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+    grade = models.IntegerField()  # Recall grade (0-5)
+
+    class Meta:
+        ordering = ['-reviewed_at']
+
+    def __str__(self):
+        return (f"Review {self.id} for Flashcard {self.flashcard.id}" +
+                f" by {self.user.email} at {self.reviewed_at}" +
+                f" - Grade: {self.grade}")
