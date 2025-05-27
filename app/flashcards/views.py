@@ -8,13 +8,18 @@ from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.response import Response
 
-from core.models import Flashcard, Deck
+from core.models import (
+    Flashcard,
+    Deck,
+    ReviewLog
+)
 
 from flashcards.serializers import (
     FlashcardSerializer,
     FlashcardListSerializer,
     DeckSerializer,
     FlashcardReviewSerializer,
+    ReviewLogSerializer,
 )
 
 from django.utils import timezone
@@ -22,7 +27,10 @@ from datetime import timedelta
 
 from flashcards.sm2 import sm2
 
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
+)
 
 
 class DeckListCreateView(generics.ListCreateAPIView):
@@ -169,3 +177,18 @@ class FlashcardReviewView(GenericAPIView):
             'new_next_review': new_next_review,
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class ReviewLogListView(ListAPIView):
+    """
+    A viewset for listing review logs.
+    """
+    serializer_class = ReviewLogSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        """Retrive review logs for the authenticated user."""
+        return ReviewLog.objects.filter(
+            user=self.request.user
+            ).order_by('-reviewed_at')
