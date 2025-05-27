@@ -14,8 +14,9 @@ def sm2(grade, old_ease_factor, old_interval, old_repetition):
     MIN_EF = 1.3
 
     if grade < 3:
-        # Again, soon!
-        return (max(old_ease_factor - 0.2, MIN_EF), 1, 0)
+        # If grade is 'Again', schedule for immediate review
+        interval = 0 if grade == 1 else 1  # 0 days for "Again", 1 day for other failed
+        return (max(old_ease_factor - 0.2, MIN_EF), interval, 0)
 
     # Repetition successful
     new_repetition = old_repetition + 1

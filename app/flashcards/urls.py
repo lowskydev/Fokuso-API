@@ -7,6 +7,7 @@ from .views import (
     FlashcardsDetailView,
     DeckListCreateView,
     DeckDetailView,
+    FlashcardReviewView,
 )
 
 app_name = 'flashcards'
@@ -19,4 +20,7 @@ urlpatterns = [
     # Flashcard Endpoints
     path('', FlashcardListCreateView.as_view(), name='flashcard-list-create'),
     path('<int:pk>/', FlashcardsDetailView.as_view(), name='flashcard-detail'),
+
+    # Flashcard Review Endpoint
+    path('<int:pk>/review/', FlashcardReviewView.as_view(), name='flashcard-review'),
 ]

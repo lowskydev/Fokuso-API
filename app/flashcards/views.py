@@ -23,6 +23,8 @@ from datetime import timedelta
 
 from flashcards.sm2 import sm2  # Assuming sm2 is a function in flashcards.sm2 module
 
+from rest_framework.generics import GenericAPIView
+
 
 class DeckListCreateView(generics.ListCreateAPIView):
     """
@@ -106,7 +108,8 @@ class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):
             ).order_by('created_at')
 
 
-class FlashcardReviewView(APIView):
+class FlashcardReviewView(GenericAPIView):
+    serializer_class = FlashcardReviewSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
