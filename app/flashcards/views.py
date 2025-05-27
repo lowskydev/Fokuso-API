@@ -6,9 +6,51 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
-from core.models import Flashcard
+from core.models import Flashcard, Deck
 
-from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
+from flashcards.serializers import (
+    FlashcardSerializer,
+    FlashcardListSerializer,
+    DeckSerializer,
+)
+
+
+class DeckListCreateView(generics.ListCreateAPIView):
+    """
+    A viewset for viewing and creating decks.
+    """
+    serializer_class = DeckSerializer
+    queryset = Deck.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        """Retrive decks for the authenticated user."""
+        return self.queryset.filter(
+            owner=self.request.user
+            ).order_by('updated_at')
+
+    def perform_create(self, serializer):
+        """Assign the deck to the authenticated user."""
+        serializer.save(
+            owner=self.request.user,
+        )
+
+
+class DeckDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    A viewset for viewing and editing decks.
+    """
+    serializer_class = DeckSerializer
+    queryset = Deck.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        """Retrive decks for the authenticated user."""
+        return self.queryset.filter(
+            owner=self.request.user
+            ).order_by('updated_at')
 
 
 class FlashcardListCreateView(generics.ListCreateAPIView):
