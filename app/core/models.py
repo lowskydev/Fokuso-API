@@ -134,6 +134,37 @@ class Flashcard(models.Model):
             days = self.interval // 1440
             return f"{days} day{'s' if days != 1 else ''}"
 
+
+class DailyReviewStats(models.Model):
+    """Daily review statistics for users"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='daily_review_stats'
+    )
+    date = models.DateField()
+    flashcards_reviewed = models.IntegerField(default=0)
+    correct_reviews = models.IntegerField(default=0)
+    incorrect_reviews = models.IntegerField(default=0)
+    total_review_time_minutes = models.IntegerField(default=0)  # Optional: track time spent
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.date} - {self.flashcards_reviewed} reviews"
+
+    @property
+    def accuracy_percentage(self):
+        """Calculate accuracy percentage"""
+        if self.flashcards_reviewed == 0:
+            return 0
+        return round((self.correct_reviews / self.flashcards_reviewed) * 100, 1)
+
+
 class ReviewLog(models.Model):
     """Log of flashcard reviews"""
     flashcard = models.ForeignKey(
