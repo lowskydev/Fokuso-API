@@ -9,6 +9,8 @@ from .views import (
     DeckDetailView,
     FlashcardReviewView,
     ReviewLogListView,
+    DailyReviewStatsView,
+    TodayReviewStatsView,
 )
 
 app_name = 'flashcards'
@@ -30,4 +32,8 @@ urlpatterns = [
 
     # Review Log Endpoint
     path('review-logs/', ReviewLogListView.as_view(), name='review-log-list'),
+
+    # Daily Review Stats Endpoints
+    path('daily-stats/', DailyReviewStatsView.as_view(), name='daily-review-stats'),
+    path('today-stats/', TodayReviewStatsView.as_view(), name='today-review-stats'),
 ]
