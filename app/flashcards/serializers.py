@@ -6,6 +6,7 @@ from core.models import (
     Flashcard,
     Deck,
     ReviewLog,
+    DailyReviewStats
 )
 
 
@@ -96,3 +97,15 @@ class ReviewLogSerializer(serializers.ModelSerializer):
         model = ReviewLog
         fields = ['id', 'flashcard_id', 'user_id', 'reviewed_at', 'grade']
         read_only_fields = fields
+
+
+class DailyReviewStatsSerializer(serializers.ModelSerializer):
+    accuracy_percentage = serializers.ReadOnlyField()
+
+    class Meta:
+        model = DailyReviewStats
+        fields = [
+            'id', 'date', 'flashcards_reviewed', 'correct_reviews',
+            'incorrect_reviews', 'accuracy_percentage', 'total_review_time_minutes'
+        ]
+        read_only_fields = ['id']
