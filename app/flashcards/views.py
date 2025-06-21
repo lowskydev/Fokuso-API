@@ -140,40 +140,55 @@ class FlashcardReviewView(GenericAPIView):
         grade = serializer.validated_data['grade']
 
         # Apply Anki algorithm
-        ef, interval, repetition = anki_algorithm(
+        ef, interval_minutes, repetition, is_learning = anki_algorithm(
             grade=grade,
-            old_ease_factor=flashcard.ease_factor,  # Now an integer
+            old_ease_factor=flashcard.ease_factor,
             old_interval=flashcard.interval,
-            old_repetition=flashcard.repetition
+            old_repetition=flashcard.repetition,
+            is_learning=flashcard.is_learning
         )
 
-        # Compute new next_review
-        if interval == 0:
-            # If interval is 0, set next review to now (immediate review)
+        # Compute new next_review based on minutes
+        if interval_minutes <= 1:
+            # Immediate review (1 minute = now in practice)
             new_next_review = timezone.now()
         else:
-            new_next_review = timezone.now() + timedelta(days=interval)
+            new_next_review = timezone.now() + timedelta(minutes=interval_minutes)
 
         # Save updated values
         flashcard.ease_factor = ef
-        flashcard.interval = interval
+        flashcard.interval = interval_minutes
         flashcard.repetition = repetition
+        flashcard.is_learning = is_learning
         flashcard.next_review = new_next_review
         flashcard.save()
 
         # Log the review
-        ReviewLog.objects.create(  # Fixed this line
+        ReviewLog.objects.create(
             flashcard=flashcard,
             user=request.user,
             grade=grade,
         )
 
+        # Helper function for human-readable interval
+        def format_interval(minutes):
+            if minutes < 60:
+                return f"{minutes} minute{'s' if minutes != 1 else ''}"
+            elif minutes < 1440:
+                hours = minutes // 60
+                return f"{hours} hour{'s' if hours != 1 else ''}"
+            else:
+                days = minutes // 1440
+                return f"{days} day{'s' if days != 1 else ''}"
+
         response_data = {
             'grade': grade,
-            'new_interval': interval,
+            'new_interval': interval_minutes,
+            'new_interval_display': format_interval(interval_minutes),
             'new_ease_factor': ef,
             'new_repetition': repetition,
             'new_next_review': new_next_review,
+            'is_learning': is_learning,
         }
         return Response(response_data, status=status.HTTP_200_OK)
 

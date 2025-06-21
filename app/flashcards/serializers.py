@@ -17,19 +17,21 @@ class DeckSerializer(serializers.ModelSerializer):
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
+    interval_display = serializers.CharField(read_only=True)  # Add human-readable interval
+
     class Meta:
         model = Flashcard
         fields = [
             'id', 'question', 'answer', 'deck', 'next_review',
-            'interval', 'ease_factor', 'repetition',
+            'interval', 'interval_display', 'ease_factor', 'repetition', 'is_learning',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'interval_display']
 
     def validate_deck(self, value):
         # Only allow decks belonging to the authenticated user
         user = self.context['request'].user
-        if value.owner != user:
+        if value and value.owner != user:
             raise serializers.ValidationError(
                 "You can only assign flashcards to your own decks."
             )
@@ -37,17 +39,21 @@ class FlashcardSerializer(serializers.ModelSerializer):
 
 
 class FlashcardListSerializer(serializers.ModelSerializer):
+    interval_display = serializers.CharField(read_only=True)
+
     class Meta:
         model = Flashcard
-        fields = ['id', 'deck', 'question', 'answer', 'next_review']
+        fields = ['id', 'deck', 'question', 'answer', 'next_review', 'interval_display', 'is_learning']
 
 
 class FlashcardReviewSerializer(serializers.Serializer):
-    grade = serializers.IntegerField(min_value=1, max_value=4)  # Changed to 1-4
+    grade = serializers.IntegerField(min_value=1, max_value=3)  # Changed to 1-3
     new_interval = serializers.IntegerField(read_only=True)
-    new_ease_factor = serializers.IntegerField(read_only=True)  # Changed to IntegerField
+    new_interval_display = serializers.CharField(read_only=True)
+    new_ease_factor = serializers.IntegerField(read_only=True)
     new_repetition = serializers.IntegerField(read_only=True)
     new_next_review = serializers.DateTimeField(read_only=True)
+    is_learning = serializers.BooleanField(read_only=True)
 
 
 class ReviewLogSerializer(serializers.ModelSerializer):
