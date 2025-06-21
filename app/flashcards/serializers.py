@@ -43,13 +43,9 @@ class FlashcardListSerializer(serializers.ModelSerializer):
 
 
 class FlashcardReviewSerializer(serializers.Serializer):
-    grade = serializers.IntegerField(min_value=0, max_value=5)
+    grade = serializers.IntegerField(min_value=1, max_value=4)  # Changed to 1-4
     new_interval = serializers.IntegerField(read_only=True)
-    new_ease_factor = serializers.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        read_only=True,
-    )
+    new_ease_factor = serializers.IntegerField(read_only=True)  # Changed to IntegerField
     new_repetition = serializers.IntegerField(read_only=True)
     new_next_review = serializers.DateTimeField(read_only=True)
 

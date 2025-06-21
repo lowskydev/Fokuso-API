@@ -109,12 +109,8 @@ class Flashcard(models.Model):
     # The next review date for the flashcard
     next_review = models.DateTimeField(default=timezone.now)
     interval = models.IntegerField(default=1)  # in days
-    # Ease factor for spaced repetition SM2 algorithm
-    ease_factor = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=Decimal('2.50')
-    )
+    # Ease factor for spaced repetition (stored as percentage, e.g., 250 = 2.5x)
+    ease_factor = models.IntegerField(default=250)  # Changed from DecimalField
     repetition = models.IntegerField(default=0)  # number of repetitions
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

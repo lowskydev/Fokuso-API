@@ -25,7 +25,7 @@ from flashcards.serializers import (
 from django.utils import timezone
 from datetime import timedelta
 
-from flashcards.sm2 import sm2
+from flashcards.sm2 import anki_algorithm  # Updated import
 
 from rest_framework.generics import (
     GenericAPIView,
@@ -139,10 +139,10 @@ class FlashcardReviewView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         grade = serializer.validated_data['grade']
 
-        # Apply SM2
-        ef, interval, repetition = sm2(
+        # Apply Anki algorithm
+        ef, interval, repetition = anki_algorithm(
             grade=grade,
-            old_ease_factor=float(flashcard.ease_factor),
+            old_ease_factor=flashcard.ease_factor,  # Now an integer
             old_interval=flashcard.interval,
             old_repetition=flashcard.repetition
         )
@@ -162,11 +162,10 @@ class FlashcardReviewView(GenericAPIView):
         flashcard.save()
 
         # Log the review
-        flashcard.review_logs.create(
+        ReviewLog.objects.create(  # Fixed this line
             flashcard=flashcard,
             user=request.user,
             grade=grade,
-            reviewed_at=timezone.now()
         )
 
         response_data = {

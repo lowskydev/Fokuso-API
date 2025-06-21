@@ -32,7 +32,7 @@ def create_flashcard(user, **params):
         'answer': 'Sample answer.',
         'next_review': '2025-05-26T14:06:31.079Z',
         'interval': 1,
-        'ease_factor': Decimal('2.30'),
+        'ease_factor': 250,  # Changed to integer
         'repetition': 0,
     }
     defaults.update(params)

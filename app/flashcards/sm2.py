@@ -1,43 +1,101 @@
 """
-SM2 Algorithm Implementation
+Anki-like Algorithm Implementation
 """
+from decimal import Decimal
+from datetime import timedelta
 
 
-def sm2(grade, old_ease_factor, old_interval, old_repetition):
+def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_learning=None):
     """
-    Apply SM2 algorithm to update scheduling fields based on
+    Apply Anki-like algorithm to update scheduling fields based on
     user's recall grade.
-    grade: int (0-5)
-    old_ease_factor: Decimal or float
-    old_interval: int (days)
+    grade: int (1-4 where 1=Again, 2=Hard, 3=Good, 4=Easy)
+    old_ease_factor: int (in percentage, e.g., 250 for 2.5x)
+    old_interval: int (in minutes for learning, days for review)
     old_repetition: int
-    Returns: (new_ease_factor, new_interval, new_repetition)
+    is_learning: bool (if None, auto-detect based on repetition)
+    Returns: (new_ease_factor, new_interval_minutes, new_repetition, is_learning_phase)
     """
-    # Minimum ease factor is 1.3 (per SuperMemo)
-    MIN_EF = 1.3
+    MIN_EF = 130  # 1.3x in percentage form
 
-    if grade < 3:
-        # If grade is 'Again', schedule for immediate review
-        # 0 days for "Again", 1 day for other failed
-        interval = 0 if grade == 1 else 1
-        return (max(old_ease_factor - 0.2, MIN_EF), interval, 0)
+    # Convert ease factor to percentage if it's in decimal form
+    if old_ease_factor < 10:
+        old_ease_factor = int(old_ease_factor * 100)
 
-    # Repetition successful
-    new_repetition = old_repetition + 1
+    # Auto-detect learning phase if not specified
+    if is_learning is None:
+        is_learning = old_repetition < 2
 
-    # First/second correct reviews: intervals 1, 6, then calculated
-    if new_repetition == 1:
-        new_interval = 1
-    elif new_repetition == 2:
-        new_interval = 6
+    new_repetition = old_repetition
+    new_is_learning = is_learning
+
+    if grade == 1:  # Again
+        # Reset to learning phase
+        new_repetition = 0
+        new_is_learning = True
+        new_interval_minutes = 1  # 1 minute (immediate in practice)
+        new_ease_factor = max(old_ease_factor - 20, MIN_EF)  # Reduce by 20%
+
+    elif grade == 2:  # Hard
+        if is_learning:
+            # In learning phase - stay in learning
+            new_repetition = old_repetition  # Don't advance repetition
+            new_is_learning = True
+            new_interval_minutes = 10  # 10 minutes
+            new_ease_factor = old_ease_factor  # Don't change ease in learning
+        else:
+            # In review phase
+            new_repetition = old_repetition + 1
+            new_is_learning = False
+            new_ease_factor = max(old_ease_factor - 15, MIN_EF)  # Reduce by 15%
+            # Convert old interval from days to minutes for calculation
+            old_interval_days = old_interval if old_interval > 1440 else old_interval / 1440
+            new_interval_days = max(1, old_interval_days * 1.2)
+            new_interval_minutes = int(new_interval_days * 1440)  # Convert back to minutes
+
+    elif grade == 3:  # Good
+        new_repetition = old_repetition + 1
+        new_ease_factor = old_ease_factor  # Ease factor stays the same
+
+        if is_learning:
+            if new_repetition == 1:
+                new_interval_minutes = 10  # 10 minutes
+                new_is_learning = True
+            elif new_repetition == 2:
+                new_interval_minutes = 1440  # 1 day (graduate to review)
+                new_is_learning = False
+            else:
+                # Shouldn't happen in normal learning, but handle it
+                new_interval_minutes = 1440  # 1 day
+                new_is_learning = False
+        else:
+            # In review phase
+            new_is_learning = False
+            # Convert old interval from minutes to days if needed
+            old_interval_days = old_interval if old_interval > 1440 else old_interval / 1440
+            new_interval_days = old_interval_days * (old_ease_factor / 100)
+            new_interval_minutes = int(new_interval_days * 1440)  # Convert to minutes
+
+    elif grade == 4:  # Easy
+        new_repetition = old_repetition + 1
+        new_ease_factor = old_ease_factor + 15  # Increase by 15%
+
+        if is_learning:
+            # Graduate immediately from learning
+            new_is_learning = False
+            new_interval_minutes = 4 * 1440  # 4 days
+        else:
+            # In review phase - easier than good
+            new_is_learning = False
+            old_interval_days = old_interval if old_interval > 1440 else old_interval / 1440
+            new_interval_days = old_interval_days * ((old_ease_factor + 30) / 100)
+            new_interval_minutes = int(new_interval_days * 1440)
+
     else:
-        new_interval = int(old_interval * old_ease_factor)
+        # Invalid grade, return unchanged
+        return (old_ease_factor, old_interval, old_repetition, is_learning)
 
-    # Update ease factor
-    new_ease_factor = (
-        old_ease_factor +
-        (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))
-    )
-    new_ease_factor = max(new_ease_factor, MIN_EF)
+    # Ensure minimum interval of 1 minute
+    new_interval_minutes = max(1, new_interval_minutes)
 
-    return (new_ease_factor, new_interval, new_repetition)
+    return (new_ease_factor, new_interval_minutes, new_repetition, new_is_learning)
