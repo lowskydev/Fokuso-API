@@ -101,18 +101,18 @@ class Flashcard(models.Model):
         Deck,
         on_delete=models.CASCADE,
         related_name='flashcards',
-        blank=True,
-        null=True
+        blank=False,  # Changed from True
+        null=False    # Changed from True
     )
     question = models.TextField(blank=False)
     answer = models.TextField(blank=False)
-    # The next review date for the flashcard
+    # The next review date for the flashcard - set to now by default
     next_review = models.DateTimeField(default=timezone.now)
     interval = models.IntegerField(default=1)  # in minutes
     # Ease factor for spaced repetition (stored as percentage, e.g., 250 = 2.5x)
     ease_factor = models.IntegerField(default=250)
-    repetition = models.IntegerField(default=0)  # number of repetitions
-    is_learning = models.BooleanField(default=True)  # New field for learning phase
+    repetition = models.IntegerField(default=0)
+    is_learning = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

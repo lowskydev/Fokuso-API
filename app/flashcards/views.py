@@ -20,6 +20,7 @@ from flashcards.serializers import (
     DeckSerializer,
     FlashcardReviewSerializer,
     ReviewLogSerializer,
+    FlashcardCreateSerializer
 )
 
 from django.utils import timezone
@@ -73,16 +74,15 @@ class DeckDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class FlashcardListCreateView(generics.ListCreateAPIView):
     """
-    A viewset for viewing and editing flashcards.
+    A viewset for viewing and creating flashcards.
     """
-    serializer_class = FlashcardSerializer
     queryset = Flashcard.objects.all()
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
         """
-        Retrive flashcards for the authenticated user.
+        Retrieve flashcards for the authenticated user.
         """
         return self.queryset.filter(
             owner=self.request.user
@@ -94,13 +94,23 @@ class FlashcardListCreateView(generics.ListCreateAPIView):
         """
         if self.request.method == 'GET':
             return FlashcardListSerializer
+        elif self.request.method == 'POST':
+            return FlashcardCreateSerializer  # Use simplified serializer for creation
         return FlashcardSerializer
 
     def perform_create(self, serializer):
         """Assign the flashcard to the authenticated user."""
-        serializer.save(
-            owner=self.request.user,
-        )
+        serializer.save(owner=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        """Override create to return full flashcard data after creation"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        flashcard = serializer.save(owner=request.user)
+
+        # Return full flashcard data using the detailed serializer
+        response_serializer = FlashcardSerializer(flashcard, context={'request': request})
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class FlashcardsDetailView(generics.RetrieveUpdateDestroyAPIView):

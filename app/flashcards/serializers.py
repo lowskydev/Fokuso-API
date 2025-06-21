@@ -17,7 +17,7 @@ class DeckSerializer(serializers.ModelSerializer):
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
-    interval_display = serializers.CharField(read_only=True)  # Add human-readable interval
+    interval_display = serializers.CharField(read_only=True)
 
     class Meta:
         model = Flashcard
@@ -26,16 +26,45 @@ class FlashcardSerializer(serializers.ModelSerializer):
             'interval', 'interval_display', 'ease_factor', 'repetition', 'is_learning',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'interval_display']
+        read_only_fields = [
+            'id', 'next_review', 'interval', 'interval_display',
+            'ease_factor', 'repetition', 'is_learning', 'created_at', 'updated_at'
+        ]
 
     def validate_deck(self, value):
+        # Deck is required
+        if not value:
+            raise serializers.ValidationError("Deck is required.")
+
         # Only allow decks belonging to the authenticated user
         user = self.context['request'].user
-        if value and value.owner != user:
+        if value.owner != user:
             raise serializers.ValidationError(
                 "You can only assign flashcards to your own decks."
             )
         return value
+
+
+class FlashcardCreateSerializer(serializers.ModelSerializer):
+    """Simplified serializer for creating flashcards"""
+
+    class Meta:
+        model = Flashcard
+        fields = ['question', 'answer', 'deck']
+
+    def validate_deck(self, value):
+        # Deck is required
+        if not value:
+            raise serializers.ValidationError("Deck is required.")
+
+        # Only allow decks belonging to the authenticated user
+        user = self.context['request'].user
+        if value.owner != user:
+            raise serializers.ValidationError(
+                "You can only assign flashcards to your own decks."
+            )
+        return value
+
 
 
 class FlashcardListSerializer(serializers.ModelSerializer):
