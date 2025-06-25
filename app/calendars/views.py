@@ -9,12 +9,14 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from datetime import datetime, date
 from collections import defaultdict
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 from core.models import Event
-from calendars.serializers import (  # Changed import
+from calendars.serializers import (
     EventSerializer,
     EventCreateSerializer,
-    EventListSerializer
+    EventListSerializer,
 )
 
 
@@ -49,7 +51,9 @@ class EventListCreateView(generics.ListCreateAPIView):
         event_date = self.request.query_params.get('date')
         if event_date:
             try:
-                event_date = datetime.strptime(event_date, '%Y-%m-%d').date()
+                event_date = datetime.strptime(
+                    event_date, '%Y-%m-%d'
+                ).date()
                 queryset = queryset.filter(date=event_date)
             except ValueError:
                 pass
@@ -63,7 +67,8 @@ class EventListCreateView(generics.ListCreateAPIView):
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(
-                Q(title__icontains=search) | Q(description__icontains=search)
+                Q(title__icontains=search) |
+                Q(description__icontains=search)
             )
 
         return queryset.order_by('date', 'start_time')
@@ -102,6 +107,34 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Event.objects.filter(owner=self.request.user)
 
 
+@extend_schema(
+    summary="Get events grouped by date",
+    description=(
+        "Return events grouped by date in format: "
+        "{'YYYY-MM-DD': [events]}"
+    ),
+    parameters=[
+        OpenApiParameter(
+            name='start_date',
+            type=OpenApiTypes.DATE,
+            description='Filter events from this date (YYYY-MM-DD)'
+        ),
+        OpenApiParameter(
+            name='end_date',
+            type=OpenApiTypes.DATE,
+            description='Filter events until this date (YYYY-MM-DD)'
+        ),
+        OpenApiParameter(
+            name='type',
+            type=OpenApiTypes.STR,
+            description=(
+                'Filter events by type '
+                '(focus, study, meeting, break, other)'
+            )
+        ),
+    ],
+    responses={200: OpenApiTypes.OBJECT}
+)
 class EventsGroupedByDateView(APIView):
     """
     Return events grouped by date - matching your frontend format
@@ -155,6 +188,10 @@ class EventsGroupedByDateView(APIView):
         return Response(dict(grouped_events), status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    summary="Get today's events",
+    description="Get all events for today for the authenticated user"
+)
 class TodayEventsView(generics.ListAPIView):
     """Get today's events for the authenticated user"""
     serializer_class = EventListSerializer

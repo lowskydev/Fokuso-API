@@ -2,18 +2,29 @@
 Serializers for the Calendars API.
 """
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from core.models import Event
 from datetime import datetime
 
 
 class EventSerializer(serializers.ModelSerializer):
     """Serializer for Event objects"""
-    time = serializers.ReadOnlyField()
+
+    @extend_schema_field(serializers.CharField)
+    def get_time(self, obj):
+        return obj.time
+
+    time = serializers.SerializerMethodField()
     endTime = serializers.CharField(
         source='end_time_formatted',
         read_only=True
     )
-    duration = serializers.ReadOnlyField()
+
+    @extend_schema_field(serializers.IntegerField)
+    def get_duration(self, obj):
+        return obj.duration
+
+    duration = serializers.SerializerMethodField()
     type = serializers.CharField(source='event_type')
 
     class Meta:
@@ -33,13 +44,14 @@ class EventSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ['id',
-                            'created_at',
-                            'updated_at',
-                            'time',
-                            'endTime',
-                            'duration'
-                            ]
+        read_only_fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'time',
+            'endTime',
+            'duration'
+        ]
 
     def validate(self, data):
         """Validate that end_time is after start_time"""
@@ -109,12 +121,22 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
 class EventListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing events"""
-    time = serializers.ReadOnlyField()
+
+    @extend_schema_field(serializers.CharField)
+    def get_time(self, obj):
+        return obj.time
+
+    time = serializers.SerializerMethodField()
     endTime = serializers.CharField(
         source='end_time_formatted',
         read_only=True
     )
-    duration = serializers.ReadOnlyField()
+
+    @extend_schema_field(serializers.IntegerField)
+    def get_duration(self, obj):
+        return obj.duration
+
+    duration = serializers.SerializerMethodField()
     type = serializers.CharField(source='event_type')
 
     class Meta:
@@ -128,3 +150,8 @@ class EventListSerializer(serializers.ModelSerializer):
             'type',
             'duration'
         ]
+
+
+class EventsGroupedSerializer(serializers.Serializer):
+    """Serializer for grouped events response"""
+    pass  # This will be a dict with date keys and event arrays as values
