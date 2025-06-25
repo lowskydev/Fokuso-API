@@ -187,3 +187,18 @@ class ReviewLog(models.Model):
         return (f"Review {self.id} for Flashcard {self.flashcard.id}" +
                 f" by {self.user.email} at {self.reviewed_at}" +
                 f" - Grade: {self.grade}")
+
+
+class FocusSession(models.Model):
+    SESSION_TYPE_CHOICES = (
+        ('focus', 'Focus'),
+        ('break', 'Break'),
+    )
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    duration = models.PositiveBigIntegerField(help_text="Duration in minutes")
+    session_type = models.CharField(max_length=10, choices=SESSION_TYPE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.session_type} - {self.duration} mins"
