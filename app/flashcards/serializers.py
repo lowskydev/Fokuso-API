@@ -23,13 +23,29 @@ class FlashcardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flashcard
         fields = [
-            'id', 'question', 'answer', 'deck', 'next_review',
-            'interval', 'interval_display', 'ease_factor', 'repetition', 'is_learning',
-            'created_at', 'updated_at'
+            'id',
+            'question',
+            'answer',
+            'deck',
+            'next_review',
+            'interval',
+            'interval_display',
+            'ease_factor',
+            'repetition',
+            'is_learning',
+            'created_at',
+            'updated_at'
         ]
         read_only_fields = [
-            'id', 'next_review', 'interval', 'interval_display',
-            'ease_factor', 'repetition', 'is_learning', 'created_at', 'updated_at'
+            'id',
+            'next_review',
+            'interval',
+            'interval_display',
+            'ease_factor',
+            'repetition',
+            'is_learning',
+            'created_at',
+            'updated_at'
         ]
 
     def validate_deck(self, value):
@@ -67,17 +83,25 @@ class FlashcardCreateSerializer(serializers.ModelSerializer):
         return value
 
 
-
 class FlashcardListSerializer(serializers.ModelSerializer):
     interval_display = serializers.CharField(read_only=True)
 
     class Meta:
         model = Flashcard
-        fields = ['id', 'deck', 'question', 'answer', 'next_review', 'interval_display', 'is_learning']
+        fields = [
+            'id',
+            'deck',
+            'question',
+            'answer',
+            'next_review',
+            'interval_display',
+            'is_learning'
+        ]
 
 
 class FlashcardReviewSerializer(serializers.Serializer):
-    grade = serializers.IntegerField(min_value=1, max_value=3)  # Changed to 1-3
+    # Changed to 1-3
+    grade = serializers.IntegerField(min_value=1, max_value=3)
     new_interval = serializers.IntegerField(read_only=True)
     new_interval_display = serializers.CharField(read_only=True)
     new_ease_factor = serializers.IntegerField(read_only=True)
@@ -105,7 +129,12 @@ class DailyReviewStatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyReviewStats
         fields = [
-            'id', 'date', 'flashcards_reviewed', 'correct_reviews',
-            'incorrect_reviews', 'accuracy_percentage', 'total_review_time_minutes'
+            'id',
+            'date',
+            'flashcards_reviewed',
+            'correct_reviews',
+            'incorrect_reviews',
+            'accuracy_percentage',
+            'total_review_time_minutes'
         ]
         read_only_fields = ['id']

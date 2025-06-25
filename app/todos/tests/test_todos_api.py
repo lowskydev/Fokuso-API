@@ -6,9 +6,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from datetime import date
 
-from core.models import Todo, Tag
+from core.models import Todo
 
 
 TODOS_URL = reverse('todos:todo-list-create')

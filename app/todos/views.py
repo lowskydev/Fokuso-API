@@ -23,7 +23,9 @@ class TodoListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Get todos for authenticated user with optional filtering"""
-        queryset = Todo.objects.filter(owner=self.request.user).prefetch_related('tags')
+        queryset = Todo.objects.filter(
+            owner=self.request.user
+            ).prefetch_related('tags')
 
         # Filter by completion status
         completed = self.request.query_params.get('completed')
@@ -69,8 +71,14 @@ class TodoListCreateView(generics.ListCreateAPIView):
         todo = serializer.save()
 
         # Return detailed todo data
-        response_serializer = TodoDetailSerializer(todo, context={'request': request})
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        response_serializer = TodoDetailSerializer(
+            todo,
+            context={'request': request}
+        )
+        return Response(
+            response_serializer.data,
+            status=status.HTTP_201_CREATED
+        )
 
 
 class TodoDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -81,7 +89,9 @@ class TodoDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         """Get todos for authenticated user"""
-        return Todo.objects.filter(owner=self.request.user).prefetch_related('tags')
+        return Todo.objects.filter(
+            owner=self.request.user
+            ).prefetch_related('tags')
 
 
 class TagListCreateView(generics.ListCreateAPIView):

@@ -12,7 +12,7 @@ from rest_framework.test import APIClient
 
 from django.utils.dateparse import parse_datetime
 
-from core.models import Flashcard
+from core.models import Flashcard, Deck
 
 from flashcards.serializers import FlashcardSerializer, FlashcardListSerializer
 
@@ -25,8 +25,29 @@ def detail_url(flashcard_id):
     return reverse('flashcards:flashcard-detail', args=[flashcard_id])
 
 
+def create_user(**params):
+    """Create and return a sample user."""
+    return get_user_model().objects.create_user(**params)
+
+
+def create_deck(user, **params):
+    """Create and return a sample deck."""
+    defaults = {'name': 'Test Deck'}
+    defaults.update(params)
+
+    # Try to get existing deck first, create if it doesn't exist
+    try:
+        return Deck.objects.get(owner=user, name=defaults['name'])
+    except Deck.DoesNotExist:
+        return Deck.objects.create(owner=user, **defaults)
+
+
 def create_flashcard(user, **params):
     """Create and return a sample flashcard."""
+    # Create a deck if not provided
+    if 'deck' not in params:
+        params['deck'] = create_deck(user)
+
     defaults = {
         'question': 'Sample question?',
         'answer': 'Sample answer.',
@@ -39,11 +60,6 @@ def create_flashcard(user, **params):
 
     flashcard = Flashcard.objects.create(owner=user, **defaults)
     return flashcard
-
-
-def create_user(**params):
-    """Create and return a sample user."""
-    return get_user_model().objects.create_user(**params)
 
 
 class PublicFlashcardsApiTests(TestCase):
@@ -68,11 +84,13 @@ class PrivateFlashcardsApiTests(TestCase):
             password='testpass123'
         )
         self.client.force_authenticate(user=self.user)
+        # Create a shared deck for all tests in this class
+        self.deck = create_deck(user=self.user, name='Shared Test Deck')
 
     def test_retrieve_flashcards(self):
         """Test retrieving a list of flashcards."""
-        create_flashcard(user=self.user)
-        create_flashcard(user=self.user)
+        create_flashcard(user=self.user, deck=self.deck)
+        create_flashcard(user=self.user, deck=self.deck)
 
         response = self.client.get(FLASHCARDS_URL)
 
@@ -88,9 +106,10 @@ class PrivateFlashcardsApiTests(TestCase):
             email='other@example.com',
             password='testpass123'
         )
+        other_deck = create_deck(user=other_user, name='Other User Deck')
 
-        create_flashcard(user=other_user)
-        create_flashcard(user=self.user)
+        create_flashcard(user=other_user, deck=other_deck)
+        create_flashcard(user=self.user, deck=self.deck)
 
         response = self.client.get(FLASHCARDS_URL)
 
@@ -104,7 +123,7 @@ class PrivateFlashcardsApiTests(TestCase):
 
     def test_get_flashcard_detail(self):
         """Test retrieving a flashcard detail."""
-        flashcard = create_flashcard(user=self.user)
+        flashcard = create_flashcard(user=self.user, deck=self.deck)
 
         url = detail_url(flashcard.id)
         response = self.client.get(url)
@@ -132,28 +151,22 @@ class PrivateFlashcardsApiTests(TestCase):
         payload = {
             'question': 'What is the capital of France?',
             'answer': 'Paris',
-            'next_review': '2025-05-26T14:06:31.079Z',
-            'interval': 1,
-            'ease_factor': Decimal('2.5'),
-            'repetition': 0,
+            'deck': self.deck.id,  # Use the shared deck
         }
-
-        # Ensure the next_review is in the correct format
-        payload['next_review'] = parse_datetime(payload['next_review'])
 
         response = self.client.post(FLASHCARDS_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         flashcard = Flashcard.objects.get(id=response.data['id'])
-        for key in payload:
-            self.assertEqual(getattr(flashcard, key), payload[key])
-
+        self.assertEqual(flashcard.question, payload['question'])
+        self.assertEqual(flashcard.answer, payload['answer'])
+        self.assertEqual(flashcard.deck.id, payload['deck'])
         self.assertEqual(flashcard.owner, self.user)
 
     def test_partial_update_flashcard(self):
         """Test partially updating a flashcard."""
-        flashcard = create_flashcard(user=self.user)
+        flashcard = create_flashcard(user=self.user, deck=self.deck)
 
         payload = {'question': 'Updated question?'}
         url = detail_url(flashcard.id)
@@ -166,19 +179,13 @@ class PrivateFlashcardsApiTests(TestCase):
 
     def test_full_update_flashcard(self):
         """Test fully updating a flashcard."""
-        flashcard = create_flashcard(user=self.user)
+        flashcard = create_flashcard(user=self.user, deck=self.deck)
 
         payload = {
             'question': 'New question?',
             'answer': 'New answer.',
-            'next_review': '2025-05-26T14:06:31.079Z',
-            'interval': 2,
-            'ease_factor': Decimal('3.0'),
-            'repetition': 1,
+            'deck': self.deck.id,
         }
-
-        # Ensure the next_review is in the correct format
-        payload['next_review'] = parse_datetime(payload['next_review'])
 
         url = detail_url(flashcard.id)
         response = self.client.put(url, payload)
@@ -186,14 +193,14 @@ class PrivateFlashcardsApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         flashcard.refresh_from_db()
-        for key in payload:
-            self.assertEqual(getattr(flashcard, key), payload[key])
-
+        self.assertEqual(flashcard.question, payload['question'])
+        self.assertEqual(flashcard.answer, payload['answer'])
+        self.assertEqual(flashcard.deck.id, payload['deck'])
         self.assertEqual(flashcard.owner, self.user)
 
     def test_delete_flashcard(self):
         """Test deleting a flashcard."""
-        flashcard = create_flashcard(user=self.user)
+        flashcard = create_flashcard(user=self.user, deck=self.deck)
 
         url = detail_url(flashcard.id)
         response = self.client.delete(url)
@@ -207,7 +214,8 @@ class PrivateFlashcardsApiTests(TestCase):
             email='user2@example.com',
             password='testpass123'
         )
-        flashcard = create_flashcard(user=other_user)
+        other_deck = create_deck(user=other_user, name='Other User Deck 2')
+        flashcard = create_flashcard(user=other_user, deck=other_deck)
 
         url = detail_url(flashcard.id)
         response = self.client.delete(url)

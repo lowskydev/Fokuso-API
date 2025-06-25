@@ -10,8 +10,6 @@ from django.contrib.auth.models import (
 
 from django.conf import settings
 
-from decimal import Decimal
-
 from django.utils import timezone
 
 
@@ -109,7 +107,8 @@ class Flashcard(models.Model):
     # The next review date for the flashcard - set to now by default
     next_review = models.DateTimeField(default=timezone.now)
     interval = models.IntegerField(default=1)  # in minutes
-    # Ease factor for spaced repetition (stored as percentage, e.g., 250 = 2.5x)
+    # Ease factor for spaced repetition
+    # (stored as percentage, e.g., 250 = 2.5x)
     ease_factor = models.IntegerField(default=250)
     repetition = models.IntegerField(default=0)
     is_learning = models.BooleanField(default=True)
@@ -146,7 +145,8 @@ class DailyReviewStats(models.Model):
     flashcards_reviewed = models.IntegerField(default=0)
     correct_reviews = models.IntegerField(default=0)
     incorrect_reviews = models.IntegerField(default=0)
-    total_review_time_minutes = models.IntegerField(default=0)  # Optional: track time spent
+    # Optional: track time spent
+    total_review_time_minutes = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -155,14 +155,18 @@ class DailyReviewStats(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f"{self.user.email} - {self.date} - {self.flashcards_reviewed} reviews"
+        return (f"{self.user.email} - {self.date} - "
+                f"{self.flashcards_reviewed} reviews")
 
     @property
     def accuracy_percentage(self):
         """Calculate accuracy percentage"""
         if self.flashcards_reviewed == 0:
             return 0
-        return round((self.correct_reviews / self.flashcards_reviewed) * 100, 1)
+        return round(
+            (self.correct_reviews / self.flashcards_reviewed) * 100,
+            1
+        )
 
 
 class ReviewLog(models.Model):
@@ -232,8 +236,16 @@ class Todo(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     completed = models.BooleanField(default=False)
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='medium'
+    )
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='other'
+    )
     due_date = models.DateField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name='todos')
     created_at = models.DateTimeField(auto_now_add=True)

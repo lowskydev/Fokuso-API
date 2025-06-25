@@ -1,10 +1,15 @@
 """
 Anki Algorithm Implementation - Exact replica
 """
-from datetime import timedelta
 
 
-def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_learning=None):
+def anki_algorithm(
+        grade,
+        old_ease_factor,
+        old_interval,
+        old_repetition,
+        is_learning=None
+        ):
     """
     Apply exact Anki algorithm.
     grade: int (1=Again, 2=Good, 3=Easy)
@@ -12,7 +17,8 @@ def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_lear
     old_interval: int (in minutes)
     old_repetition: int
     is_learning: bool (if None, auto-detect based on repetition)
-    Returns: (new_ease_factor, new_interval_minutes, new_repetition, is_learning_phase)
+    Returns: (new_ease_factor, new_interval_minutes, new_repetition,
+              is_learning_phase)
     """
     MIN_EF = 130  # 1.3x in percentage form
 
@@ -59,7 +65,10 @@ def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_lear
 
             # Convert to days for calculation
             old_interval_days = max(1, old_interval // 1440)
-            new_interval_days = max(1, int(old_interval_days * (old_ease_factor / 100)))
+            new_interval_days = max(
+                1,
+                int(old_interval_days * (old_ease_factor / 100))
+            )
             new_interval_minutes = new_interval_days * 1440
 
     elif grade == 3:  # Easy
@@ -77,7 +86,10 @@ def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_lear
             old_interval_days = max(1, old_interval // 1440)
             # Easy multiplier = ease factor * 1.3 (Anki's easy bonus)
             easy_multiplier = (old_ease_factor / 100) * 1.3
-            new_interval_days = max(1, int(old_interval_days * easy_multiplier))
+            new_interval_days = max(
+                1,
+                int(old_interval_days * easy_multiplier)
+            )
             new_interval_minutes = new_interval_days * 1440
 
         # Increase ease factor by 15% for easy (like Anki)
@@ -94,4 +106,9 @@ def anki_algorithm(grade, old_ease_factor, old_interval, old_repetition, is_lear
     max_interval_minutes = 36500 * 1440
     new_interval_minutes = min(new_interval_minutes, max_interval_minutes)
 
-    return (new_ease_factor, new_interval_minutes, new_repetition, new_is_learning)
+    return (
+        new_ease_factor,
+        new_interval_minutes,
+        new_repetition,
+        new_is_learning
+    )

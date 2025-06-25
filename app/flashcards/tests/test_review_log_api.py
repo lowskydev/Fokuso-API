@@ -9,7 +9,6 @@ from rest_framework.test import APIClient
 
 from core.models import Flashcard, Deck, ReviewLog
 from django.utils import timezone
-from decimal import Decimal
 
 
 REVIEW_LOGS_URL = reverse('flashcards:review-log-list')
@@ -33,7 +32,7 @@ def create_flashcard(user, deck, **params):
         'deck': deck,
         'next_review': timezone.now(),
         'interval': 1,
-        'ease_factor': Decimal('2.5'),
+        'ease_factor': 250,  # Changed to integer
         'repetition': 0,
     }
     defaults.update(params)
@@ -72,7 +71,7 @@ class PrivateReviewLogApiTests(TestCase):
 
     def test_review_log_created_on_review(self):
         """Test a ReviewLog is created when reviewing a flashcard."""
-        payload = {'grade': 4}
+        payload = {'grade': 2}  # Changed from 4 to 2 (valid range is 1-3)
         res = self.client.post(review_url(self.flashcard.id),
                                payload,
                                format='json',
@@ -85,7 +84,7 @@ class PrivateReviewLogApiTests(TestCase):
         )
         self.assertEqual(logs.count(), 1)
         log = logs.first()
-        self.assertEqual(log.grade, 4)
+        self.assertEqual(log.grade, 2)
         self.assertIsNotNone(log.reviewed_at)
 
     def test_review_log_list(self):
@@ -94,12 +93,12 @@ class PrivateReviewLogApiTests(TestCase):
         ReviewLog.objects.create(
             user=self.user,
             flashcard=self.flashcard,
-            grade=4,
+            grade=2,
         )
         ReviewLog.objects.create(
             user=self.user,
             flashcard=self.flashcard,
-            grade=5,
+            grade=3,
         )
 
         res = self.client.get(REVIEW_LOGS_URL)
@@ -125,10 +124,10 @@ class PrivateReviewLogApiTests(TestCase):
         ReviewLog.objects.create(
             user=self.user,
             flashcard=self.flashcard,
-            grade=5,
+            grade=2,
         )
 
         res = self.client.get(REVIEW_LOGS_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]['grade'], 5)
+        self.assertEqual(res.data[0]['grade'], 2)

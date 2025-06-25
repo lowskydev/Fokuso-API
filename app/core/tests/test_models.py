@@ -61,13 +61,20 @@ class ModelTests(TestCase):
     def test_create_flashcard(self):
         """Test creating a flashcard is successful"""
         user = create_user()
+        # Create a deck first since flashcard requires one
+        deck = models.Deck.objects.create(
+            owner=user,
+            name='Test Deck'
+        )
         flashcard = models.Flashcard.objects.create(
             owner=user,
+            deck=deck,  # Add the required deck
             question='What is the capital of France?',
             answer='Paris',
             next_review=timezone.now() + timedelta(days=1),
         )
 
         self.assertEqual(flashcard.owner, user)
+        self.assertEqual(flashcard.deck, deck)
         self.assertEqual(flashcard.question, 'What is the capital of France?')
         self.assertEqual(flashcard.answer, 'Paris')
