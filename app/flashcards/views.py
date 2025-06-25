@@ -35,6 +35,8 @@ from rest_framework.generics import (
     ListAPIView,
 )
 
+from drf_spectacular.utils import extend_schema
+
 
 class DeckListCreateView(generics.ListCreateAPIView):
     """
@@ -280,12 +282,17 @@ class DailyReviewStatsView(ListAPIView):
         ).order_by('-date')
 
 
-class TodayReviewStatsView(GenericAPIView):
+@extend_schema(
+    summary="Get today's review statistics",
+    description="Get today's review statistics for the authenticated user"
+)
+class TodayReviewStatsView(generics.GenericAPIView):
     """
     A view for getting today's review statistics.
     """
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+    serializer_class = DailyReviewStatsSerializer  # Add this line
 
     def get(self, request):
         """Get today's review stats for the authenticated user."""

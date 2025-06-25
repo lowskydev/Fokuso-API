@@ -9,6 +9,8 @@ from core.models import (
     DailyReviewStats
 )
 
+from drf_spectacular.utils import extend_schema_field
+
 
 class DeckSerializer(serializers.ModelSerializer):
     class Meta:
@@ -124,7 +126,11 @@ class ReviewLogSerializer(serializers.ModelSerializer):
 
 
 class DailyReviewStatsSerializer(serializers.ModelSerializer):
-    accuracy_percentage = serializers.ReadOnlyField()
+    @extend_schema_field(serializers.FloatField)
+    def get_accuracy_percentage(self, obj):
+        return obj.accuracy_percentage
+
+    accuracy_percentage = serializers.SerializerMethodField()
 
     class Meta:
         model = DailyReviewStats
