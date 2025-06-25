@@ -187,3 +187,60 @@ class ReviewLog(models.Model):
         return (f"Review {self.id} for Flashcard {self.flashcard.id}" +
                 f" by {self.user.email} at {self.reviewed_at}" +
                 f" - Grade: {self.grade}")
+
+
+class Tag(models.Model):
+    """Tag object for categorizing todos"""
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tags'
+    )
+    name = models.CharField(max_length=50, unique=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('owner', 'name')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Todo(models.Model):
+    """Todo object"""
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+
+    CATEGORY_CHOICES = [
+        ('work', 'Work'),
+        ('personal', 'Personal'),
+        ('health', 'Health'),
+        ('finance', 'Finance'),
+        ('education', 'Education'),
+        ('other', 'Other'),
+    ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='todos'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    completed = models.BooleanField(default=False)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    due_date = models.DateField(blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, related_name='todos')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
