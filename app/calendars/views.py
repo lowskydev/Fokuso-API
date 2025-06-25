@@ -1,5 +1,5 @@
 """
-Views for the calendar app.
+Views for the calendars app.
 """
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +11,7 @@ from datetime import datetime, date
 from collections import defaultdict
 
 from core.models import Event
-from calendar.serializers import (
+from calendars.serializers import (  # Changed import
     EventSerializer,
     EventCreateSerializer,
     EventListSerializer

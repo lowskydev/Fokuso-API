@@ -1,15 +1,15 @@
 """
-URLs for the calendar app.
+URLs for the calendars app.
 """
 from django.urls import path
-from calendar.views import (
+from calendars.views import (
     EventListCreateView,
     EventDetailView,
     EventsGroupedByDateView,
     TodayEventsView,
 )
 
-app_name = 'calendar'
+app_name = 'calendars'
 
 urlpatterns = [
     # Event endpoints
@@ -22,5 +22,9 @@ urlpatterns = [
         EventsGroupedByDateView.as_view(),
         name='events-grouped'
     ),
-    path('events/today/', TodayEventsView.as_view(), name='today-events'),
+    path(
+        'events/today/',
+        TodayEventsView.as_view(),
+        name='today-events'
+    ),
 ]

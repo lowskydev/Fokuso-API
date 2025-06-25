@@ -36,4 +36,5 @@ urlpatterns = [
         namespace='flashcards',
         )),
     path('api/todos/', include('todos.urls')),
+    path('api/calendars/', include('calendars.urls')),
 ]

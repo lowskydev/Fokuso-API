@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'notes',
     'flashcards',
     'todos',
+    'calendars',
 ]
 
 MIDDLEWARE = [

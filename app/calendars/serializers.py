@@ -1,5 +1,5 @@
 """
-Serializers for the Calendar API.
+Serializers for the Calendars API.
 """
 from rest_framework import serializers
 from core.models import Event
