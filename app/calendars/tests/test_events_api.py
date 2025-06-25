@@ -173,7 +173,7 @@ class PrivateEventApiTests(TestCase):
         self.assertEqual(event.event_type, payload['event_type'])
 
     def test_delete_event(self):
-        """Test deleting an event"""
+        """Test deltion of an event"""
         event = create_event(user=self.user)
 
         url = detail_url(event.id)
