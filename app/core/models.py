@@ -256,3 +256,69 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Event(models.Model):
+    """Event object for calendar"""
+    EVENT_TYPE_CHOICES = [
+        ('focus', 'Focus'),
+        ('study', 'Study'),
+        ('meeting', 'Meeting'),
+        ('break', 'Break'),
+        ('other', 'Other'),
+    ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='events'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    event_type = models.CharField(
+        max_length=20,
+        choices=EVENT_TYPE_CHOICES,
+        default='other'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['date', 'start_time']
+
+    def __str__(self):
+        return f"{self.title} - {self.date} {self.start_time}"
+
+    @property
+    def duration(self):
+        """Calculate duration in minutes"""
+        if self.start_time and self.end_time:
+            start_datetime = timezone.datetime.combine(
+                timezone.datetime.today().date(),
+                self.start_time
+            )
+            end_datetime = timezone.datetime.combine(
+                timezone.datetime.today().date(),
+                self.end_time
+            )
+
+            # Handle events that cross midnight
+            if end_datetime < start_datetime:
+                end_datetime += timezone.timedelta(days=1)
+
+            duration = end_datetime - start_datetime
+            return int(duration.total_seconds() / 60)
+        return 0
+
+    @property
+    def time(self):
+        """Return start time in HH:MM format"""
+        return self.start_time.strftime('%H:%M')
+
+    @property
+    def end_time_formatted(self):
+        """Return end time in HH:MM format"""
+        return self.end_time.strftime('%H:%M')
