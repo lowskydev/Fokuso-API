@@ -35,4 +35,5 @@ urlpatterns = [
         ('flashcards.urls', 'flashcards'),
         namespace='flashcards',
         )),
+    path('api/todos/', include('todos.urls')),
 ]
