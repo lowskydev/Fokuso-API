@@ -37,4 +37,5 @@ urlpatterns = [
         )),
     path('api/todos/', include('todos.urls')),
     path('api/calendars/', include('calendars.urls')),
+    path('api/stats/', include('stats.urls')),
 ]
