@@ -248,10 +248,10 @@ app/
 ### **Authentication**
 
 ```
-POST   /api/user/create/         # User registration
-POST   /api/user/token/          # Login & token generation
-GET    /api/user/me/             # User profile
-PATCH  /api/user/me/             # Update profile
+POST   /api/user/create/                   # User registration
+POST   /api/user/token/                    # Login & token generation
+GET    /api/user/me/                       # User profile
+PATCH  /api/user/me/                       # Update profile
 ```
 
 ### **Flashcards**
