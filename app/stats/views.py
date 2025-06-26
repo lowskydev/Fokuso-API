@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.db.models import Sum
 from rest_framework.authentication import TokenAuthentication
 
+
 class CreateFocusSessionView(generics.CreateAPIView):
     serializer_class = FocusSessionSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -18,38 +19,53 @@ class CreateFocusSessionView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)  # Fixed: was 'user'
 
+
 class UserStatsView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
-    serializer_class = UserStatsSerializer  # Add serializer (GenericAPIView requires a serializer class)
+    serializer_class = UserStatsSerializer  # Add serializer
+    # (GenericAPIView requires a serializer class)
 
     def get(self, request):
         user = request.user
-        sessions = FocusSession.objects.filter(owner=user)  # Fixed: was 'user'
+        sessions = FocusSession.objects.filter(
+            owner=user
+        )  # Fixed: was 'user'
 
         total_sessions = sessions.count()
-        total_focus_time = sessions.filter(session_type='focus').aggregate(
-            total=Sum('duration'))['total'] or 0  # Fixed aggregate method
-        total_break_time = sessions.filter(session_type='break').aggregate(
-            total=Sum('duration'))['total'] or 0  # Fixed aggregate method
+        total_focus_time = sessions.filter(
+            session_type='focus'
+        ).aggregate(total=Sum('duration'))['total'] or 0
+
+        total_break_time = sessions.filter(
+            session_type='break'
+        ).aggregate(total=Sum('duration'))['total'] or 0
 
         today = timezone.now().date()
         today_focus_time = sessions.filter(
             session_type='focus',  # Fixed: was 'sessions_type'
             created_at__date=today
-        ).aggregate(total=Sum('duration'))['total'] or 0  # Fixed aggregate method
+        ).aggregate(total=Sum('duration'))['total'] or 0
 
         focus_dates = sessions.filter(session_type='focus') \
-              .values_list('created_at', flat=True)
-        focus_days = list({dt.date() for dt in focus_dates})  # remove duplicates
+            .values_list('created_at', flat=True)
+        focus_days = list({dt.date() for dt in focus_dates})
+        # remove duplicates
 
-        current_streak, longest_streak = self.calculate_streaks(focus_days)
+        current_streak, longest_streak = self.calculate_streaks(
+            focus_days
+        )
 
         # Get count of focus sessions only for average calculation
-        focus_sessions_count = sessions.filter(session_type='focus').count()
+        focus_sessions_count = sessions.filter(
+            session_type='focus'
+        ).count()
 
         # Count average of focus session rather than both
-        average_session_length = total_focus_time // focus_sessions_count if focus_sessions_count else 0
+        average_session_length = (
+            total_focus_time // focus_sessions_count
+            if focus_sessions_count else 0
+        )
 
         stats = {
             "totalSessions": total_sessions,
@@ -57,9 +73,9 @@ class UserStatsView(generics.GenericAPIView):
             "todayFocusTime": today_focus_time,
             "currentStreak": current_streak,
             "longestStreak": longest_streak,
-            "averageSessionLength": average_session_length, # fixed this line
+            "averageSessionLength": average_session_length,
             "thisWeekSessions": sessions.filter(
-                created_at__gte=timezone.now() - timedelta(days=7)  # Fixed: was timezone()
+                created_at__gte=timezone.now() - timedelta(days=7)
             ).count(),
             "thisMonthSessions": sessions.filter(
                 created_at__gte=timezone.now() - timedelta(days=30)

@@ -5,7 +5,9 @@ from core.models import FocusSession
 class FocusSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = FocusSession  # Fixed: was "Model"
-        fields = ['id', 'owner', 'session_type', 'duration', 'created_at']  # Fixed: was 'user'
+        fields = [
+            'id', 'owner', 'session_type', 'duration', 'created_at'
+            ]  # Fixed: was 'user'
         read_only_fields = ['id', 'owner', 'created_at']  # Fixed: was 'user'
 
 
