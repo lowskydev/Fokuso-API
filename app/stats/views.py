@@ -5,6 +5,7 @@ from .serializers import (
     UserStatsSerializer,
     WeeklyDataSerializer,
     HourlyDataSerializer,
+    SessionDetailSerializer,
 )
 from rest_framework.response import Response
 from django.utils import timezone
@@ -193,3 +194,57 @@ class HourlyDataView(generics.GenericAPIView):
             })
 
         return Response(hourly_data)
+
+
+class SessionListView(generics.ListAPIView):
+    """List all individual focus/break sessions for the authenticated user"""
+    serializer_class = SessionDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        """Get sessions for authenticated user with optional filtering"""
+        user = self.request.user
+        queryset = FocusSession.objects.filter(owner=user)
+
+        # Optional filtering by session type
+        session_type = self.request.query_params.get('session_type')
+        if session_type:
+            queryset = queryset.filter(session_type=session_type)
+
+        # Optional filtering by date
+        date = self.request.query_params.get('date')
+        if date:
+            try:
+                from datetime import datetime
+                date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+                queryset = queryset.filter(created_at__date=date_obj)
+            except ValueError:
+                pass  # Invalid date format, ignore filter
+
+        # Optional filtering by date range
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+
+        if start_date:
+            try:
+                from datetime import datetime
+                start_date_obj = datetime.strptime(
+                    start_date,
+                    '%Y-%m-%d'
+                    ).date()
+                queryset = queryset.filter(
+                    created_at__date__gte=start_date_obj
+                )
+            except ValueError:
+                pass
+
+        if end_date:
+            try:
+                from datetime import datetime
+                end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+                queryset = queryset.filter(created_at__date__lte=end_date_obj)
+            except ValueError:
+                pass
+
+        return queryset.order_by('-created_at')
