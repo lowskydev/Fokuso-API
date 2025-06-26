@@ -11,6 +11,8 @@
   <img src="https://github.com/lowskydev/Fokuso/blob/main/src/assets/logo.png" alt="Fokuso Logo" width="120" height="120">
 </div>
 
+**🔗 [Frontend Repository](https://github.com/lowskydev/Fokuso)**
+
 [✨ Features](#-features) • [🚀 Quick Start](#-quick-start) • [🛠️ Tech Stack](#%EF%B8%8F-tech-stack) • [📁 Project Structure](#-project-structure) • [🤝 Contributing](#-contributing)
 
 </div>
@@ -19,7 +21,7 @@
 
 ## 📖 About
 
-Fokuso API is the robust Django REST backend that powers the Fokuso productivity platform. Built with modern development practices, it provides a comprehensive suite of APIs for focus management, spaced repetition learning, task organization, and productivity analytics.
+Fokuso API is the robust Django REST backend that powers the [Fokuso productivity platform](https://github.com/lowskydev/Fokuso). Built with modern development practices, it provides a comprehensive suite of APIs for focus management, spaced repetition learning, task organization, and productivity analytics.
 
 The API implements Test Driven Development (TDD) principles and includes comprehensive documentation via Swagger UI, making it easy for developers to integrate and extend the platform's capabilities.
 
