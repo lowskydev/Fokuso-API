@@ -21,3 +21,14 @@ class UserStatsSerializer(serializers.Serializer):
     thisWeekSessions = serializers.IntegerField()
     thisMonthSessions = serializers.IntegerField()
     totalBreakTime = serializers.IntegerField()
+
+
+class WeeklyDataSerializer(serializers.Serializer):
+    day = serializers.CharField()
+    sessions = serializers.IntegerField()
+    focusTime = serializers.IntegerField()
+
+
+class HourlyDataSerializer(serializers.Serializer):
+    hour = serializers.CharField()
+    sessions = serializers.IntegerField()
