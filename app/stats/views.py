@@ -172,12 +172,12 @@ class HourlyDataView(generics.GenericAPIView):
             session_type='focus'
         )
 
-        # Create hourly data (6 AM to 10 PM)
+        # Create hourly data for all 24 hours (0-23)
         hourly_data = []
 
         # Initialize all hours with 0 sessions
         hour_counts = {}
-        for hour in range(6, 23):  # 6 AM to 10 PM
+        for hour in range(0, 24):  # Changed from range(6, 23) to range(0, 24)
             hour_counts[hour] = 0
 
         # Count sessions by hour
@@ -186,8 +186,8 @@ class HourlyDataView(generics.GenericAPIView):
             if hour in hour_counts:
                 hour_counts[hour] += 1
 
-        # Format the response
-        for hour in range(6, 23):
+        # Format the response for all 24 hours
+        for hour in range(0, 24):  # Changed from range(6, 23) to range(0, 24)
             hourly_data.append({
                 'hour': str(hour),
                 'sessions': hour_counts[hour]
