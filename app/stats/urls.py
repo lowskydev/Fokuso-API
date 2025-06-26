@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import CreateFocusSessionView, UserStatsView, WeeklyDataView, HourlyDataView
+from .views import (
+    CreateFocusSessionView,
+    UserStatsView,
+    WeeklyDataView,
+    HourlyDataView,
+)
 
 urlpatterns = [
     path('session/', CreateFocusSessionView.as_view(), name='create-session'),
