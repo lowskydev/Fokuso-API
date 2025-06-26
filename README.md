@@ -193,44 +193,44 @@ docker compose exec -T db psql -U devuser devdb < backup.sql
 app/
 ├── 📁 app/                       # Main application configuration
 │   ├── 📄 settings.py            # Django settings
-│   ├── 📄 urls.py               # URL routing
-│   └── 📄 calc.py               # Utility functions
+│   ├── 📄 urls.py                # URL routing
+│   └── 📄 calc.py                # Utility functions
 │
 ├── 📁 core/                      # Core application models
-│   ├── 📄 models.py             # Database models
-│   ├── 📄 admin.py              # Admin interface
-│   └── 📁 management/           # Custom management commands
+│   ├── 📄 models.py              # Database models
+│   ├── 📄 admin.py               # Admin interface
+│   └── 📁 management/            # Custom management commands
 │
 ├── 📁 user/                      # User authentication
-│   ├── 📄 views.py              # Auth views
-│   ├── 📄 serializers.py        # User serializers
-│   └── 📄 urls.py               # User URLs
+│   ├── 📄 views.py               # Auth views
+│   ├── 📄 serializers.py         # User serializers
+│   └── 📄 urls.py                # User URLs
 │
 ├── 📁 flashcards/                # Spaced repetition system
-│   ├── 📄 views.py              # Flashcard views
-│   ├── 📄 serializers.py        # Card serializers
-│   ├── 📄 sm2.py                # SM-2 algorithm
-│   └── 📄 urls.py               # Flashcard URLs
+│   ├── 📄 views.py               # Flashcard views
+│   ├── 📄 serializers.py         # Card serializers
+│   ├── 📄 sm2.py                 # SM-2 algorithm
+│   └── 📄 urls.py                # Flashcard URLs
 │
 ├── 📁 calendars/                 # Calendar management
-│   ├── 📄 views.py              # Calendar views
-│   ├── 📄 serializers.py        # Event serializers
-│   └── 📄 urls.py               # Calendar URLs
+│   ├── 📄 views.py               # Calendar views
+│   ├── 📄 serializers.py         # Event serializers
+│   └── 📄 urls.py                # Calendar URLs
 │
 ├── 📁 todos/                     # Task management
-│   ├── 📄 views.py              # Todo views
-│   ├── 📄 serializers.py        # Task serializers
-│   └── 📄 urls.py               # Todo URLs
+│   ├── 📄 views.py               # Todo views
+│   ├── 📄 serializers.py         # Task serializers
+│   └── 📄 urls.py                # Todo URLs
 │
 ├── 📁 stats/                     # Analytics system
-│   ├── 📄 views.py              # Statistics views
-│   ├── 📄 serializers.py        # Stats serializers
-│   └── 📄 urls.py               # Stats URLs
+│   ├── 📄 views.py               # Statistics views
+│   ├── 📄 serializers.py         # Stats serializers
+│   └── 📄 urls.py                # Stats URLs
 │
 └── 📁 notes/                     # Note management
-    ├── 📄 views.py              # Notes views
-    ├── 📄 serializers.py        # Note serializers
-    └── 📄 urls.py               # Notes URLs
+    ├── 📄 views.py               # Notes views
+    ├── 📄 serializers.py         # Note serializers
+    └── 📄 urls.py                # Notes URLs
 ```
 
 ### **Key Architecture Decisions**
@@ -248,10 +248,10 @@ app/
 ### **Authentication**
 
 ```
-POST   /api/user/create/         # User registration
-POST   /api/user/token/          # Login & token generation
-GET    /api/user/me/             # User profile
-PATCH  /api/user/me/             # Update profile
+POST   /api/user/create/                   # User registration
+POST   /api/user/token/                    # Login & token generation
+GET    /api/user/me/                       # User profile
+PATCH  /api/user/me/                       # Update profile
 ```
 
 ### **Flashcards**
