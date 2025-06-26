@@ -35,7 +35,8 @@ class UserStatsView(generics.GenericAPIView):
             owner=user
         )  # Fixed: was 'user'
 
-        total_sessions = sessions.count()
+        # make total sessions only the focus sessions
+        total_sessions = sessions.exclude(session_type='break').count()
         total_focus_time = sessions.filter(
             session_type='focus'
         ).aggregate(total=Sum('duration'))['total'] or 0
@@ -77,10 +78,10 @@ class UserStatsView(generics.GenericAPIView):
             "currentStreak": current_streak,
             "longestStreak": longest_streak,
             "averageSessionLength": average_session_length,
-            "thisWeekSessions": sessions.filter(
+            "thisWeekSessions": sessions.exclude(session_type='break').filter(
                 created_at__gte=timezone.now() - timedelta(days=7)
             ).count(),
-            "thisMonthSessions": sessions.filter(
+            "thisMonthSessions": sessions.exclude(session_type='break').filter(
                 created_at__gte=timezone.now() - timedelta(days=30)
             ).count(),
             "totalBreakTime": total_break_time,
