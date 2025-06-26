@@ -32,3 +32,15 @@ class WeeklyDataSerializer(serializers.Serializer):
 class HourlyDataSerializer(serializers.Serializer):
     hour = serializers.CharField()
     sessions = serializers.IntegerField()
+
+
+class SessionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FocusSession
+        fields = [
+            'id',
+            'session_type',
+            'duration',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'owner', 'created_at']
