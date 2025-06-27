@@ -144,7 +144,7 @@ docker compose run --rm app sh -c "python manage.py makemigrations"
 #### **Database Management**
 
 ```bash
-# Reset database (careful - this deletes all data!)
+# Reset database (careful - this deletes all data in fokuso)
 docker compose down
 docker volume rm fokuso-api_dev-db-data
 docker compose up
