@@ -31,7 +31,7 @@ The API implements Test Driven Development (TDD) principles and includes compreh
 
 ### 🔐 **Authentication & User Management**
 
-- **Token-based Authentication**: Secure user sessions
+- **Token-based Authentication**: Secure user sessions with tokens
 - **User Registration & Login**: Complete auth flow
 - **Profile Management**: User data management
 
