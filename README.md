@@ -100,8 +100,13 @@ Before you begin, ensure you have the following installed:
    ```
 
 3. **Access the application**
+
    - **API Documentation**: [http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs)
    - **Admin Panel**: [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
+
+4. **Setup the Fokuso Frontend**
+
+   Follow the instructions in the [Frontend Repository](https://github.com/lowskydev/Fokuso) to set up the frontend application.
 
 ### Important Commands
 
